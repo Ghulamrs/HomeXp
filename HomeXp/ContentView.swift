@@ -44,7 +44,7 @@ struct ContentView: View {
                 
                 if self.filteredItems.isEmpty {
                     let amount = Int(txt) ?? 0
-                    if(amount > 1000) {
+                    if(amount > 100) {
                         self.filteredItems = allItems.filter {
                             ($0.quantity*$0.rate >= Float(amount))
                         }
@@ -56,6 +56,9 @@ struct ContentView: View {
         })
         .onAppear(perform: {
             self.filteredItems = allItems.compactMap( { $0 } )
+//            self.filteredItems = allItems.sorted { (it1, it2) -> Bool in
+  //              it1.quantity*it1.rate > it2.quantity*it2.rate
+    //        }
         })
         .onChange(of: allItems.count, perform: { _ in
             self.filteredItems = allItems.compactMap( { $0 } )

@@ -14,8 +14,8 @@ import SwiftUI
 class PieChartData: ObservableObject {
     @Published private(set) var data: [SlideData] = []
     let colors = [ Color.red, Color(red: 0.2, green: 0.5, blue: 0.2), Color.orange, Color(red: 1, green: 0.5, blue: 0.5), // 4 count
-        Color.blue, Color.purple, Color.pink, Color(red: 0, green: 0.7, blue: 0.7), Color.yellow, Color.green, Color.gray, // 7 count
-        Color.black,  Color.white // 2 Extra entries are only to avoid exceptions in future updates (Only 11 are being used)
+        Color.blue, Color.purple, Color.pink, Color(red: 0, green: 0.7, blue: 0.7), Color.yellow, Color.green, // 6 count
+        Color(red: 0, green: 0.5, blue: 0.5), Color.gray,  Color.white // 2 Extra entries are only to avoid exception  Only 11 are being used)
     ]
 
     init(name: [String], data: [Double]) {

@@ -33,7 +33,7 @@ struct Home: View {
                                 summaryItem = item
                                 showSummary = true
                             }, label: {
-                                 Text("Summary")
+                                 Text("Amount")
                             })
                             Button(action: {
                                 if items.count == aitems.count {
@@ -94,7 +94,7 @@ struct Home: View {
             )
             .alert(isPresented: $showSummary) {
                 Alert(title:Text(String(format: "Amount: %5.1f", self.summaryItem.quantity*self.summaryItem.rate)),
-                          message: Text(String(format: "qty %1.f", self.summaryItem.quantity)) + Text(String(format: " rate %4.f", self.summaryItem.rate)),
+                          message: Text(String(format: "(quantity %g,", self.summaryItem.quantity)) + Text(String(format: " rate %3.f)", self.summaryItem.rate)),
                           dismissButton: .default(Text("Cancel")))
             }
             if(items.isEmpty) {
@@ -104,7 +104,7 @@ struct Home: View {
                 Text("\(CountOf(items: self.items)) \(UnitOf(value: self.items.last!.title!)), \(items.count) txns").font(.caption).fontWeight(.bold)
             }
             Spacer()
-            Text("©2020 Home 11.0, G. R. Akhtar, Islamabad.").font(.caption).foregroundColor(.gray)
+            Text("©2020 Home 12.0, G. R. Akhtar, Islamabad.").font(.caption).foregroundColor(.gray)
         }
     }
 
@@ -116,7 +116,7 @@ struct Home: View {
             fatalError("Unresolved error: \(error)")
         }
     }
-    
+
     func CountOf(items: [Item]) -> Int32 {
         var total: Float = 0
         for item in items {
@@ -144,54 +144,44 @@ struct Home: View {
 
     struct Name: Hashable, Identifiable {
         var id: Int
-        var name: String
+        var names: [String]
     }
     
     func Compute() {
-        let catagory: [Name] = [
-            Name(id: 0, name: "Bricks"),
-            Name(id: 1, name: "Cement"),
-            Name(id: 2, name: "Crush"),
-            Name(id: 3, name: "Electric"),
-            Name(id: 4, name: "Hakim"),
-            Name(id: 5, name: "Marble"),
-            Name(id: 6, name: "Paint"),
-            Name(id: 7, name: "Steel"),
-            Name(id: 8, name: "Tile"),
-            Name(id: 9, name: "Windows"),
-            Name(id:10, name: "Others")
+        let catagories: [Name] = [
+            Name(id: 0, names: ["Bricks"]),
+            Name(id: 1, names: ["Cement"]),
+            Name(id: 2, names: ["Crush", "Sand"]),
+            Name(id: 3, names: ["Electric", "Lights", "Sheets", "Akbar"]),
+            Name(id: 4, names: ["Hakim"]),
+            Name(id: 5, names: ["Marble"]),
+            Name(id: 6, names: ["Paint", "Wajid"]),
+            Name(id: 7, names: ["Steel"]),
+            Name(id: 8, names: ["Tile"]),
+            Name(id: 9, names: ["Windows", "Grill"]),
+            Name(id:10, names: ["Door", "Cupboard"])
         ]
 
+        var total: Float = 0
         var cats = [String]()
         var budgets = [Double]()
-        var all = SumOf(items: self.items)
-
-        for cat in catagory {
-            let its = aitems.filter {
-                ($0.title!.lowercased().contains(cat.name.lowercased()))
+        
+        for catagory in catagories {
+            var budget: Float = 0
+            for name in catagory.names {
+                let its = aitems.filter { $0.title!.lowercased().contains(name.lowercased()) }
+                budget += SumOf(items: its)
             }
-            cats.append(cat.name)
-            if cat.name == "Others" {
-                budgets.append(Double(all))
-            } else {
-                let bud = SumOf(items: its)
-                budgets.append(Double(bud))
-                all -= bud
-            }
+            cats.append(catagory.names.first!)
+            budgets.append(Double(budget))
+            total += budget
         }
         
-        // Add 'Lights' items expenses to Electric catagory
-        let its = aitems.filter {
-            ($0.title!.lowercased().contains("lights"))
-        }
-        let catagoryIndex = cats.firstIndex(of: "Electric")
-        if  catagoryIndex != nil {
-            let index: Int = catagoryIndex!
-            if  index < budgets.count {
-                budgets[index] += Double(SumOf(items: its))
-            }
-        }
-        // Update above info to Pie Chart View Model class
-        pvm.updateData(tags: cats, values: budgets)
+        let atotal = SumOf(items: self.items)
+        cats.append("Others")
+        budgets.append(Double(atotal-total))
+
+        // Update above info to PieChart's View Model
+        pvm.updateData(tags: cats, values: budgets, total: Double(atotal))
     }
 }

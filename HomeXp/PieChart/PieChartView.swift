@@ -24,13 +24,13 @@ struct PieChartView: View {
                     .frame(width: geometry.size.width,
                            height: geometry.size.width)
                 Spacer()
-                Text("Budget Consumption Distribution")
-                    .foregroundColor(Color(red: 0, green: 0.35, blue: 0))
+                Text("Rs \(viewModel.totalExpenditure, specifier: "%5.0f") Catagory vise Distribution")
+                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity, maxHeight: 50, alignment: .center)
                     .background(Color(red: 1, green: 0.5, blue: 0.5))
                     .cornerRadius(20)
                 Spacer()
-                Text("©2020 Home 11.0, G. R. Akhtar, Islamabad.").font(.caption).foregroundColor(.gray)
+                Text("©2020 Home 12.0, G. R. Akhtar, Islamabad.").font(.caption).foregroundColor(.gray)
             }
         }.padding()
     }
