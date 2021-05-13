@@ -16,17 +16,21 @@ struct Home: View {
     @State private var showSummary: Bool = false
     @State private var isPresented: Bool = false
     @State private var isPiePresented: Bool = false
-    
+    @State private var isEndOfList: Bool = false
+
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject var ivm = ItemViewModel()
     @StateObject var pvm = PieChartViewModel()
 
     var body: some View {
+        ScrollViewReader { index in
         VStack {
             ScrollView(.vertical, showsIndicators: false, content: {
                 VStack(alignment: .leading, spacing: -20) {
                     ForEach(items) { item in
+                        let itno = items.lastIndex(of: item)!
                         ItemView(itno: items.lastIndex(of: item) ?? 0, item: item)
+                            .id(itno)
                         .padding()
                         .contextMenu {
                             Button(action: {
@@ -79,7 +83,9 @@ struct Home: View {
                 }) {
                     PieChartView(viewModel: pvm)
                 },
-                trailing: Button(action: {
+                trailing: 
+            	HStack {
+		    Button(action: {
                         ivm.title.removeAll()
                         isPresented = true
                     }, label: {
@@ -91,6 +97,18 @@ struct Home: View {
                     }) {
                         AddItemView(itemViewModel: ivm)
                     }
+                                        Button(action: {
+                                            isEndOfList.toggle()
+                                            withAnimation {
+                                                index.scrollTo(isEndOfList ? items.count-1 : 0)
+                                            }
+                                        }, label: {
+                                            Image(systemName: "arrow.down.circle")
+                                                .font(.title)
+                                                .rotationEffect(.degrees(isEndOfList ? 180 : 0))
+                                                .animation(.spring())
+                                        })
+                                    } // HStack
             )
             .alert(isPresented: $showSummary) {
                 Alert(title:Text(String(format: "Amount: %5.1f", self.summaryItem.quantity*self.summaryItem.rate)),
@@ -104,7 +122,8 @@ struct Home: View {
                 Text("\(CountOf(items: self.items)) \(UnitOf(value: self.items.last!.title!)), \(items.count) txns").font(.caption).fontWeight(.bold)
             }
             Spacer()
-            Text("©2020 Home 12.0, G. R. Akhtar, Islamabad.").font(.caption).foregroundColor(.gray)
+                Text("©2020 Home 13.0, G. R. Akhtar, Islamabad.").font(.caption).foregroundColor(.gray)
+        }
         }
     }
 
